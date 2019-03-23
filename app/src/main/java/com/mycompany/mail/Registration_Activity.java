@@ -25,23 +25,12 @@ public class Registration_Activity extends Activity {
             Sname = ETname.getText().toString();
             Slogin = ETlogin.getText().toString();
             Spass = ETpass.getText().toString();
-            String Slogpass = Slogin + Spass;
 
-            Zapros zapros = new Zapros(Sname, Slogpass);
-            zapros.start();
-            TimeUnit.SECONDS.sleep(1);
-
-            boolean emptyColumn = zapros.getIsEmpty();
-            if (emptyColumn) {
-                Toast.makeText(this, "Регистрация прошла успешно. Вернитесь на главную страницу", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Такой логин уже существует!", Toast.LENGTH_LONG).show();
-            }
+            RequestRegistration requestRegistration = new RequestRegistration(Sname,Slogin,Spass,this);
+            requestRegistration.execute();
 
         } catch (NullPointerException e) {
             Toast.makeText(this, "Заполните все поля!", Toast.LENGTH_LONG).show();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

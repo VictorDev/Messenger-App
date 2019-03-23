@@ -20,9 +20,7 @@ public class LoginActivity extends Activity {
     final String LOGIN = "login";
     final String PASSWORD = "password";
     final String ISCHECKED = "isChecked";
-    public final String ID = "id";
-    public final String USERNAME = "userName";
-    public boolean isCorrect = true;
+    public String login,password;
 
 
     @Override
@@ -38,7 +36,7 @@ public class LoginActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        sPref = getPreferences(MODE_PRIVATE);
+        sPref = getSharedPreferences("UserLogPass",MODE_PRIVATE);
         if (sPref.getString(LOGIN, "") != null) {
             loginText.setText(sPref.getString(LOGIN, ""));
         }
@@ -52,41 +50,15 @@ public class LoginActivity extends Activity {
 
     public void Login(View view) {
         try {
-            String login = loginText.getText().toString();
-            String password = passwordText.getText().toString();
-            String logPas = login + password;
+            login = loginText.getText().toString();
+            password = passwordText.getText().toString();
 
-            Zapros zapros = new Zapros(logPas);
-            zapros.start();
-            TimeUnit.SECONDS.sleep(1);
-
-            isCorrect = zapros.getIsCorrect();
-            if (isCorrect) {
-                int idUser = zapros.getIdUser();
-                String userName = zapros.getUserName();
-                if (remember.isChecked()) {
-                    sPref = getPreferences(MODE_PRIVATE);
-                    SharedPreferences.Editor ed = sPref.edit();
-                    ed.putString(LOGIN, login);
-                    ed.putString(PASSWORD, password);
-                    ed.putBoolean(ISCHECKED, true);
-                    ed.commit();
-                }
-
-                //нужно отправить id и userName
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra(ID, idUser);
-                intent.putExtra(USERNAME, userName);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Введен неверный логин/пароль! Или слабое соединение", Toast.LENGTH_LONG).show();
-            }
+            RequestLogin requestLogin = new RequestLogin(login,password,remember,this);
+            requestLogin.execute();
 
         } catch (NullPointerException e) {
             Toast.makeText(this, "Не введен логин/пароль!", Toast.LENGTH_LONG).show();
             e.printStackTrace();
-        } catch (InterruptedException ie) {
-            Log.i("LoginActivity", "ошибка остановки активности " + ie.getMessage());
         }
     }
 
@@ -94,6 +66,5 @@ public class LoginActivity extends Activity {
         Intent intent = new Intent(this, Registration_Activity.class);
         startActivity(intent);
     }
-
 
 }
